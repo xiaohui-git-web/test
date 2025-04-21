@@ -5,15 +5,32 @@
     <title>小工具</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .diff-result {
-            white-space: pre-wrap;
+        .diff-container {
+            display: flex;
+            width: 100%;
+        }
+        .diff-column {
+            flex: 1;
+            overflow: auto;
+            padding: 0 10px;
+        }
+        .diff-line {
+            white-space: pre;
             font-family: monospace;
+            padding: 2px;
+            border-bottom: 1px solid #eee;
+            min-height: 20px;
         }
         .added {
             background-color: #ddffdd;
         }
         .removed {
             background-color: #ffdddd;
+        }
+        .separator {
+            width: 1px;
+            background-color: #ccc;
+            margin: 0 10px;
         }
     </style>
 </head>
@@ -47,12 +64,15 @@
                 <h5 class="card-title">对比结果</h5>
             </div>
             <div class="card-body">
-                <div id="diffResult" class="diff-result"></div>
+                <div id="diffResult" class="diff-container">
+                    <div class="diff-column" id="leftColumn"></div>
+                    <div class="separator"></div>
+                    <div class="diff-column" id="rightColumn"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.1.0/diff.min.js"></script>
     <script>
         // 文件上传处理
         document.getElementById('upload1').addEventListener('change', function(e) {
@@ -74,25 +94,53 @@
         }
 
         // 文件对比
-        document.getElementById('compareBtn').addEventListener('click', function() {
-            const text1 = document.getElementById('file1').value;
-            const text2 = document.getElementById('file2').value;
-            
-            if (!text1 || !text2) {
-                alert('请先输入或上传两个文件内容');
-                return;
+        document.getElementById('compareBtn').addEventListener('click', async function() {
+            try {
+                const text1 = document.getElementById('file1').value;
+                const text2 = document.getElementById('file2').value;
+                
+                if (!text1 || !text2) {
+                    alert('请先输入或上传两个文件内容');
+                    return;
+                }
+
+                const response = await fetch('/api/compare', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text1: text1,
+                        text2: text2
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('请求失败: ' + response.status);
+                }
+
+                const data = await response.json();
+                const leftColumn = document.getElementById('leftColumn');
+                const rightColumn = document.getElementById('rightColumn');
+                leftColumn.innerHTML = '';
+                rightColumn.innerHTML = '';
+
+                data.result.forEach(item => {
+                    const leftLine = document.createElement('div');
+                    leftLine.className = `diff-line ${item.left.type}`;
+                    leftLine.textContent = item.left.content;
+                    leftColumn.appendChild(leftLine);
+
+                    const rightLine = document.createElement('div');
+                    rightLine.className = `diff-line ${item.right.type}`;
+                    rightLine.textContent = item.right.content;
+                    rightColumn.appendChild(rightLine);
+                });
+
+            } catch (error) {
+                console.error('对比出错:', error);
+                alert('对比出错: ' + error.message);
             }
-
-            const diff = Diff.diffLines(text1, text2);
-            const display = document.getElementById('diffResult');
-            display.innerHTML = '';
-
-            diff.forEach(part => {
-                const span = document.createElement('span');
-                span.className = part.added ? 'added' : part.removed ? 'removed' : '';
-                span.appendChild(document.createTextNode(part.value));
-                display.appendChild(span);
-            });
         });
     </script>
 </body>
