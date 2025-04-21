@@ -68,6 +68,11 @@
                             <i class="bi bi-cpu"></i> 监控
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-tools"></i> 小工具
+                        </a>
+                    </li>
                      <!-- 
                     <li class="nav-item">
                         <a class="nav-link" href="#">
@@ -159,6 +164,8 @@
                     page = "/operation.html";
                 } else if($(this).text().trim() === "监控") {
                     page = "/monitor.html";
+                } else if($(this).text().trim() === "小工具") {
+                    page = "/tools.html";
                 }
                 
                 if(page) {
