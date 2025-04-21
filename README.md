@@ -4,8 +4,12 @@
 
 ## 功能特点
 - 响应式布局，适配不同设备
-- 文件对比工具（支持左右分栏对比）
-- 简洁直观的界面
+- 智能文件对比工具：
+  - 支持左右分栏对比
+  - 自动检测文件编码(UTF-8/GBK/UTF-16等)
+  - 差异高亮显示
+- 简洁直观的运维管理界面
+- 模块化代码结构
 
 ## 部署要求
 1. Python 3.6+
@@ -21,7 +25,7 @@ git clone https://github.com/xiaohui-git-web/test.git
 cd test
 
 # 安装依赖
-pip install flask
+pip install flask chardet
 ```
 
 ## 运行方法
@@ -48,3 +52,4 @@ http://localhost:8100/
 - operation.html: 运维管理
 - monitor.html: 监控页面
 - tools.html: 小工具页面
+- utils/: 工具函数目录
