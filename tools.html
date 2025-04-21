@@ -4,16 +4,96 @@
     <meta charset="UTF-8">
     <title>小工具</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .diff-result {
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .added {
+            background-color: #ddffdd;
+        }
+        .removed {
+            background-color: #ffdddd;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-4">
         <h2>小工具</h2>
-        <div class="card">
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title">文件对比工具</h5>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">实用工具</h5>
-                <p class="card-text">这里是小工具的内容区域，包含各种实用工具。</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>文件1</h6>
+                        <textarea id="file1" class="form-control mb-3" rows="10" placeholder="粘贴文件1内容或上传文件"></textarea>
+                        <input type="file" id="upload1" class="form-control mb-3">
+                    </div>
+                    <div class="col-md-6">
+                        <h6>文件2</h6>
+                        <textarea id="file2" class="form-control mb-3" rows="10" placeholder="粘贴文件2内容或上传文件"></textarea>
+                        <input type="file" id="upload2" class="form-control mb-3">
+                    </div>
+                </div>
+                <button id="compareBtn" class="btn btn-primary">对比文件</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">对比结果</h5>
+            </div>
+            <div class="card-body">
+                <div id="diffResult" class="diff-result"></div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.1.0/diff.min.js"></script>
+    <script>
+        // 文件上传处理
+        document.getElementById('upload1').addEventListener('change', function(e) {
+            handleFileUpload(e, 'file1');
+        });
+        document.getElementById('upload2').addEventListener('change', function(e) {
+            handleFileUpload(e, 'file2');
+        });
+
+        function handleFileUpload(event, targetId) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById(targetId).value = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+
+        // 文件对比
+        document.getElementById('compareBtn').addEventListener('click', function() {
+            const text1 = document.getElementById('file1').value;
+            const text2 = document.getElementById('file2').value;
+            
+            if (!text1 || !text2) {
+                alert('请先输入或上传两个文件内容');
+                return;
+            }
+
+            const diff = Diff.diffLines(text1, text2);
+            const display = document.getElementById('diffResult');
+            display.innerHTML = '';
+
+            diff.forEach(part => {
+                const span = document.createElement('span');
+                span.className = part.added ? 'added' : part.removed ? 'removed' : '';
+                span.appendChild(document.createTextNode(part.value));
+                display.appendChild(span);
+            });
+        });
+    </script>
 </body>
 </html>
