@@ -1,15 +1,26 @@
-from flask import Flask, render_template, send_from_directory, request, jsonify
+from flask import Flask, render_template, send_from_directory, request, jsonify, make_response
 from difflib import Differ
+from utils.file_utils import detect_file_encoding, decode_file
 
 app = Flask(__name__, template_folder='./')
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    response = make_response(render_template('index.html'))
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    return response
 
 @app.route('/<filename>')
 def html_files(filename):
-    return send_from_directory('.', filename)
+    response = make_response(send_from_directory('.', filename))
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    return response
+
+@app.route('/api/detect-encoding', methods=['POST'])
+def detect_encoding():
+    file_content = request.data
+    encoding = detect_file_encoding(file_content)
+    return jsonify({'encoding': encoding})
 
 @app.route('/api/compare', methods=['POST'])
 def compare_files():
