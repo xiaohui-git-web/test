@@ -88,9 +88,17 @@
             
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById(targetId).value = e.target.result;
+                fetch('/api/detect-encoding', {
+                    method: 'POST',
+                    body: e.target.result
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const decoder = new TextDecoder(data.encoding);
+                    document.getElementById(targetId).value = decoder.decode(e.target.result);
+                });
             };
-            reader.readAsText(file);
+            reader.readAsArrayBuffer(file);
         }
 
         // 文件对比
