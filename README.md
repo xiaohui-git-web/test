@@ -25,7 +25,7 @@ git clone https://github.com/xiaohui-git-web/test.git
 cd test
 
 # 安装依赖
-pip install flask chardet
+pip install flask
 ```
 
 ## 运行方法
@@ -52,4 +52,3 @@ http://localhost:8100/
 - operation.html: 运维管理
 - monitor.html: 监控页面
 - tools.html: 小工具页面
-- utils/: 工具函数目录
