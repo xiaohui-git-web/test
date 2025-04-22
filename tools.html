@@ -88,17 +88,20 @@
             
             const reader = new FileReader();
             reader.onload = function(e) {
+                // 直接显示文件内容
+                document.getElementById(targetId).value = e.target.result;
+                
+                // 可选：发送到后端检测编码
                 fetch('/api/detect-encoding', {
                     method: 'POST',
                     body: e.target.result
                 })
                 .then(response => response.json())
                 .then(data => {
-                    const decoder = new TextDecoder(data.encoding);
-                    document.getElementById(targetId).value = decoder.decode(e.target.result);
+                    console.log('检测到文件编码:', data.encoding);
                 });
             };
-            reader.readAsArrayBuffer(file);
+            reader.readAsBinaryString(file);
         }
 
         // 文件对比
